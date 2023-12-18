@@ -1,34 +1,25 @@
 ﻿using System;
+using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
-namespace ChristmasWithTypes
+namespace APIAndJSON2
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var xmas = new Christmas();
+            var client = new HttpClient();
+            var APIUrl = $"https://api.openweathermap.org/data/2.5/weather?q={KeysAndSuch.city},{KeysAndSuch.country}&appid={KeysAndSuch.APIKey}&units=imperial";
 
-            var xmasDay = Christmas.Day.Thursday;
-
-            //DONE set Santa's name to Kris Kringle
-            xmas.Santa = ("Kris Kringle");
-
-            //DONE Insert 3 presents you would like for xmas.  They must be strings
-            xmas.Presents =  new string[3]{"Yeti SB140 LR Pink", "Weston Eclipse Splitboard", "Snow setup for my truck"}; 
-
-            //DONE Set the TreeHeight to 10
-            xmas.TreeHeight = 10;
-
-            Console.WriteLine($"This year christmas falls on {xmasDay} \n");
-            Console.WriteLine($"Our tree will be {xmas.TreeHeight} feet high \n");
-            Console.WriteLine("Here are the presents we would like:");
-
-            foreach (var present in xmas.Presents)
-            {
-                Console.WriteLine($"    {present}");
-            }
-
-            Console.WriteLine($"\n We like to call Santa, {xmas.Santa}");
+            var weatherResponse = client.GetStringAsync(APIUrl).Result;
+            
+            JObject responseFormatted = JObject.Parse(weatherResponse);
+            
+            var temp = responseFormatted["main"]["temp"];
+            var feelsLike = responseFormatted["main"]["feels_like"];
+            var description = responseFormatted["weather"][0]["description"];
+            var wind = responseFormatted["wind"]["speed"];
+            Console.WriteLine($"The current weather for {KeysAndSuch.city} is {temp} Degrees F (feels like {feelsLike}) with {description} and a {wind} mph wind.");
         }
     }
 }
